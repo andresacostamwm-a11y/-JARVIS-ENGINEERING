@@ -26,7 +26,6 @@ docker compose up --build
 | `demo@jarvis.local` | `demo1234` | ENGINEER |
 | `admin@jarvis.local` | `admin1234` | ADMIN |
 
-
 All seed data is labeled **DEMO**.
 
 ## Stack
@@ -51,7 +50,7 @@ All seed data is labeled **DEMO**.
 
 ## Calculation engine
 
-Real Python modules under `services/api/app/services/calculations/`.  
+Real Python modules under `services/api/app/services/calculations/`.
 Every result persists: **INPUT / FORMULA / UNITS / ASSUMPTIONS / RESULT / CHECK / SOURCE / VERSION**.
 
 ```bash
@@ -64,7 +63,7 @@ PYTHONPATH=services/api pytest tests/calculations -v
 
 ## Drawing source of truth
 
-**JARVIS Drawing JSON** (nodes + edges in Postgres) — not raster images.  
+**JARVIS Drawing JSON** (nodes + edges in Postgres) — not raster images.
 React Flow editor can save/edit and export JSON + SVG.
 
 ## RBAC roles
@@ -104,25 +103,6 @@ React Flow editor can save/edit and export JSON + SVG.
 - Chat without `XAI_API_KEY` returns a degraded message or tool-result summary.
 - SVG export is a schematic rendering of Drawing JSON (JSON remains SoT).
 
-## Repo layout
-
-```
-apps/web/
-services/api/
-services/worker/
-services/cad/          # stub
-packages/              # thin shared types
-infrastructure/docker/
-tests/calculations/
-docs/ARCHITECTURE.md
-docker-compose.yml
-.env.example
-```
-
 ## License
 
 MIT — see [LICENSE](LICENSE).
-
-## Docker note (this environment)
-
-If `docker` / `docker compose` is unavailable on the host, install Docker Desktop or Engine, then run `docker compose up --build` from the repo root. The Compose file and Dockerfiles are complete; absence of the Docker CLI is an environment blocker, not a missing project artifact.
