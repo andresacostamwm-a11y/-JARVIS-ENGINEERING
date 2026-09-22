@@ -1,2 +1,7 @@
-STATUS='COMING SOON'
-def import_dwg(path:str):return {'status':STATUS,'message':'DWG import not implemented in MVP'}
+"""CAD service stub — COMING SOON."""
+
+STATUS = "COMING SOON"
+
+
+def import_dwg(_path: str) -> dict:
+    return {"status": STATUS, "message": "DWG import not implemented in MVP"}
