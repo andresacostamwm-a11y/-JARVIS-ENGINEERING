@@ -1,0 +1,128 @@
+"use client";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { api } from "@/lib/api";
+
+export default function CalculationsPage() {
+  const [result, setResult] = useState<unknown>(null);
+  const [tab, setTab] = useState<"electrical" | "hydraulic" | "energy">("electrical");
+  const vd = useForm({
+    defaultValues: {
+      current_a: 100,
+      length_m: 80,
+      conductor_area_mm2: 35,
+      voltage_v: 480,
+      phases: 3,
+      material: "copper",
+    },
+  });
+  const pump = useForm({
+    defaultValues: { flow_m3_h: 450, head_m: 35, efficiency: 0.75 },
+  });
+  const energy = useForm({
+    defaultValues: { cooling_capacity_kw: 1758.5, power_input_kw: 320 },
+  });
+
+  const runVd = vd.handleSubmit(async (values) => {
+    const res = await api("/api/v1/calculations/electrical", {
+      method: "POST",
+      body: JSON.stringify({ subtype: "voltage_drop", persist: true, ...values }),
+    });
+    setResult(res);
+  });
+  const runPump = pump.handleSubmit(async (values) => {
+    const res = await api("/api/v1/calculations/hydraulic", {
+      method: "POST",
+      body: JSON.stringify({ subtype: "pump_power", persist: true, ...values }),
+    });
+    setResult(res);
+  });
+  const runCop = energy.handleSubmit(async (values) => {
+    const res = await api("/api/v1/calculations/energy", {
+      method: "POST",
+      body: JSON.stringify({ subtype: "chiller_cop", persist: true, ...values }),
+    });
+    setResult(res);
+  });
+
+  return (
+    <div>
+      <h1 className="text-2xl font-bold">Cálculos verificados</h1>
+      <p className="mt-1 text-sm text-[var(--muted)]">
+        Motor Python determinista. Persistimos INPUT / FORMULA / UNITS / ASSUMPTIONS / RESULT / CHECK /
+        SOURCE / VERSION.
+      </p>
+      <div className="mt-4 flex gap-2 text-sm">
+        {(["electrical", "hydraulic", "energy"] as const).map((t) => (
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            className={`rounded-lg px-3 py-1.5 ${
+              tab === t ? "bg-jarvis-600 text-white" : "border border-[var(--border)]"
+            }`}
+          >
+            {t}
+          </button>
+        ))}
+      </div>
+
+      {tab === "electrical" && (
+        <form onSubmit={runVd} className="jarvis-panel mt-4 grid max-w-xl gap-3 rounded-xl border p-4">
+          <h2 className="font-semibold">Caída de tensión</h2>
+          {(["current_a", "length_m", "conductor_area_mm2", "voltage_v"] as const).map((f) => (
+            <label key={f} className="text-sm">
+              {f}
+              <input
+                type="number"
+                step="any"
+                className="mt-1 w-full rounded border border-[var(--border)] bg-transparent px-2 py-1.5"
+                {...vd.register(f, { valueAsNumber: true })}
+              />
+            </label>
+          ))}
+          <button className="rounded-lg bg-jarvis-600 px-3 py-2 text-white">Calcular</button>
+        </form>
+      )}
+      {tab === "hydraulic" && (
+        <form onSubmit={runPump} className="jarvis-panel mt-4 grid max-w-xl gap-3 rounded-xl border p-4">
+          <h2 className="font-semibold">Potencia de bomba</h2>
+          {(["flow_m3_h", "head_m", "efficiency"] as const).map((f) => (
+            <label key={f} className="text-sm">
+              {f}
+              <input
+                type="number"
+                step="any"
+                className="mt-1 w-full rounded border border-[var(--border)] bg-transparent px-2 py-1.5"
+                {...pump.register(f, { valueAsNumber: true })}
+              />
+            </label>
+          ))}
+          <button className="rounded-lg bg-jarvis-600 px-3 py-2 text-white">Calcular</button>
+        </form>
+      )}
+      {tab === "energy" && (
+        <form onSubmit={runCop} className="jarvis-panel mt-4 grid max-w-xl gap-3 rounded-xl border p-4">
+          <h2 className="font-semibold">COP de chiller</h2>
+          {(["cooling_capacity_kw", "power_input_kw"] as const).map((f) => (
+            <label key={f} className="text-sm">
+              {f}
+              <input
+                type="number"
+                step="any"
+                className="mt-1 w-full rounded border border-[var(--border)] bg-transparent px-2 py-1.5"
+                {...energy.register(f, { valueAsNumber: true })}
+              />
+            </label>
+          ))}
+          <button className="rounded-lg bg-jarvis-600 px-3 py-2 text-white">Calcular</button>
+        </form>
+      )}
+
+      {result && (
+        <pre className="mt-6 max-h-[480px] overflow-auto rounded-xl bg-white/5 p-4 text-xs">
+          {JSON.stringify(result, null, 2)}
+        </pre>
+      )}
+    </div>
+  );
+}
