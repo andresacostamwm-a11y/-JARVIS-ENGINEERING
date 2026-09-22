@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #f8fafc;
+  --fg: #0f172a;
+  --panel: #ffffff;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --accent: #0891b2;
+}
+
+.dark {
+  --bg: #0b1220;
+  --fg: #e2e8f0;
+  --panel: #111827;
+  --muted: #94a3b8;
+  --border: #1f2937;
+  --accent: #22d3ee;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.jarvis-panel {
+  background: var(--panel);
+  border-color: var(--border);
+}
