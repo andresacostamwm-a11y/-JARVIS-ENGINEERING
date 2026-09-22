@@ -1,0 +1,11 @@
+FROM python:3.12-slim
+WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+COPY services/worker/requirements.txt /tmp/worker-req.txt
+COPY services/api/requirements.txt /tmp/api-req.txt
+RUN pip install --no-cache-dir -r /tmp/worker-req.txt -r /tmp/api-req.txt
+COPY services/api /api
+COPY services/worker/app /app/app
+ENV PYTHONPATH=/app:/api
+ENV C_FORCE_ROOT=1
+CMD ["celery", "-A", "app.celery_app.celery", "worker", "--loglevel=info"]
